@@ -44,8 +44,7 @@ if __name__ == "__main__":
         url = f"{os.getenv('DATA_URL')}{x}/change/"
 
         res = session.get(url)
-        print(res.url)
-        print(url)
+        print(f'client {x}')
 
         if res.url != url:
             continue    
@@ -75,12 +74,12 @@ if __name__ == "__main__":
 
         phones = {}
 
-        i = 0
-        while True:
+        for i in range(9):
             phone_id = f'{utils.PARTIAL_PHONE_ID}{i}'
             tr_element = client_data.find('tr', id=phone_id)
             if not tr_element:
-                break
+                phones[phone_id.replace('_set-','')] = '{}'
+                continue
 
             phone = {}
             for td_class in utils.TD_CLASSES:
@@ -94,7 +93,6 @@ if __name__ == "__main__":
                     selected_option = select_element.find('option', selected=True)
                     phone[td_class.replace('field-','')] = selected_option.text
             phones[phone_id.replace('_set-','')] = phone
-            i+=1
 
         # print(phones)
 
@@ -118,7 +116,7 @@ if __name__ == "__main__":
         data = {**general_info, **phones, **address, **operator}
         # print(data)
 
-        file_name = 'data.csv'
+        file_name = 'popy-data.csv'
         with open(file_name, mode='a') as csv_file:
             writer = csv.writer(csv_file)
             if is_first_iter:
