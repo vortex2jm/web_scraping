@@ -38,4 +38,3 @@ ADDR_IDS = [
 
 OPERATOR_ID = 'id_clientexoperadora_set-0-operadora'
 
-# Other info in div class=readonly in div class=resp...Seg,Tec,Adm
