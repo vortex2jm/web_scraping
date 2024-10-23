@@ -87,13 +87,12 @@ class PopyScraping:
     def __get_client_general_info(self, soup):
         general_info = {}
 
-        for inp_id in utils.INPT_IDS:   # Find all input values
+        for inp_id in utils.CLIENT_GENERAL_INFO_INPT_IDS:   # Find all input values
             input_element = soup.find('input', id=inp_id)
             if input_element:
                 general_info[inp_id.replace('id_','')] = input_element.get('value', '-')
 
-
-        for slct_id in utils.SLCT_IDS:  # Find selected option in toggle select
+        for slct_id in utils.CLIENT_GENERAL_INFO_SLCT_IDS:  # Find selected option in toggle select
             select_element = soup.find('select', id=slct_id)
             if select_element:
                 selected_option = select_element.find('option', selected=True)
@@ -107,14 +106,14 @@ class PopyScraping:
         phones = {}
 
         for i in range(9):  # Iter over 9 possible phones
-            phone_id = f'{utils.PARTIAL_PHONE_ID}{i}'
+            phone_id = f'{utils.CLIENT_PARTIAL_PHONE_ID}{i}'
             tr_element = soup.find('tr', id=phone_id)
             if not tr_element:
                 phones[phone_id.replace('_set-','')] = '{}'
                 continue
 
             phone = {}
-            for td_class in utils.TD_CLASSES:   # Iter only over existent phones
+            for td_class in utils.CLIENT_PHONES_TD_CLASSES:   # Iter only over existent phones
                 td_element = tr_element.find('td', class_=td_class)
                 input_element = td_element.find('input')
                 if input_element:
@@ -132,7 +131,7 @@ class PopyScraping:
     #====================================
     def __get_client_address(self, soup):
         address = {}    
-        for addr_id in utils.ADDR_IDS:
+        for addr_id in utils.CLIENT_ADDR_IDS:
             input_element = soup.find('input', id=addr_id)
             if input_element:
                 address[addr_id.replace('id_endereco-0-','')] = input_element.get('value', '-')
@@ -143,9 +142,137 @@ class PopyScraping:
     #=====================================
     def __get_client_operator(self, soup):
         operator = {}
-        select_element = soup.find('select', id=utils.OPERATOR_ID)
+        select_element = soup.find('select', id=utils.CLIENT_OPERATOR_ID)
         if select_element:
             selected_option = select_element.find('option', selected=True)
             operator["operadora"] = selected_option.text
 
         return operator
+
+    #===========================
+    def get_operator_data(self):
+        if not self.__session:
+            print("You must login before get data!")
+            exit(1)
+        
+        try:
+            res = self.__session.get(self.__scrap_url)
+
+            if res.url != self.__scrap_url: # If the operator does not exists (verify scrap_url)
+                return None    
+
+            soup = BeautifulSoup(res.text, 'html.parser')
+            
+            general_info = self.__get_operator_general_info(soup)
+            phones = self.__get_operator_phones(soup)
+            address = self.__get_operator_address(soup)
+            clients = self.__get_operator_clients(soup)
+
+            print(f'{general_info["nome"]} extracted!')
+
+            return {**general_info, **phones, **address, **clients}
+                
+        except Exception as e:
+            print(f"Could not get operator data - {e}")
+            exit(1)
+    
+    #==========================================
+    def __get_operator_general_info(self, soup):
+        general_info = {}
+
+        for inp_id in utils.OPERATOR_GENERAL_INFO_INPT_IDS:   # Find all input values
+            input_element = soup.find('input', id=inp_id)
+            if input_element:
+                general_info[inp_id.replace('id_','')] = input_element.get('value', '-')
+
+        for slct_id in utils.OPERATOR_GENERAL_INFO_SLCT_IDS:  # Find selected option in toggle select
+            select_element = soup.find('select', id=slct_id)
+            if select_element:
+                selected_option = select_element.find('option', selected=True)
+                general_info[slct_id.replace('id_','')] = selected_option.text
+        
+        return general_info
+
+
+    def __get_operator_phones(self, soup):
+        phones = {}
+
+        for i in range(15):  # Iter over 9 possible phones
+            phone_id = f'{utils.OPERATOR_PARTIAL_PHONE_ID}{i}'
+            tr_element = soup.find('tr', id=phone_id)
+            if not tr_element:
+                phones[phone_id.replace('_set-','')] = '{}'
+                continue
+
+            phone = {}
+            for td_class in utils.OPERATOR_PHONE_TD_CLASSES:   # Iter only over existent phones
+                td_element = tr_element.find('td', class_=td_class)
+                input_element = td_element.find('input')
+                if input_element:
+                    phone[td_class.replace('field-','')] = input_element.get('value', '-')
+                    continue
+                select_element = td_element.find('select')
+                if select_element:  # Select phone's owner
+                    selected_option = select_element.find('option', selected=True)
+                    phone[td_class.replace('field-','')] = selected_option.text
+            phones[phone_id.replace('_set-','')] = phone
+        
+        return phones
+
+    #=====================================
+    def __get_operator_clients(self, soup):
+        clients = {}
+
+        for i in range(15):
+            client_id = f'{utils.OPERATOR_PARTIAL_CLIENT_ID}{i}'
+            tr_element = soup.find('tr', id=client_id)
+            if not tr_element:
+                clients[client_id.replace('_set-','')] = '{}'
+                continue
+
+            client = {}
+            td_element = tr_element.find('td', class_=utils.OPERATOR_CLIENT_TD_CLASS)
+            select_element = td_element.find('select')
+            if select_element:
+                selected_option = select_element.find('option', selected=True)
+                client[utils.OPERATOR_CLIENT_TD_CLASS.replace('field-','')] = selected_option.text
+
+            clients[client_id.replace('_set-','')] = client
+        return clients
+
+    #=====================================
+    def __get_operator_address(self, soup):
+        address = {}    
+        for addr_id in utils.OPERATOR_ADDR_IDS:
+            input_element = soup.find('input', id=addr_id)
+            if input_element:
+                address[addr_id.replace('id_endereco-0-','')] = input_element.get('value', '-')
+        
+        return address
+
+
+    #=========================
+    def get_circuit_data(self):
+        if not self.__session:
+            print("You must login before get data!")
+            exit(1)
+        
+        try:
+            res = self.__session.get(self.__scrap_url)
+
+            if res.url != self.__scrap_url: # If the operator does not exists (verify scrap_url)
+                return None    
+
+            soup = BeautifulSoup(res.text, 'html.parser')
+            
+            # general_info = self.__get_client_general_info(soup)
+            # phones = self.__get_client_phones(soup)
+            # address = self.__get_client_address(soup)
+            # operator = self.__get_client_operator(soup)
+
+            print(f'{1} extracted!')
+
+            return {}        
+        except Exception as e:
+            print(f"Could not get circuit data - {e}")
+            exit(1)

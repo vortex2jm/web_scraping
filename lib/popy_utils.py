@@ -1,4 +1,5 @@
-INPT_IDS = [
+# HTML classes and id's for client scraping
+CLIENT_GENERAL_INFO_INPT_IDS = [
     'id_nome',
     'id_email',
     'id_cnpj',
@@ -7,7 +8,7 @@ INPT_IDS = [
     'id_horario_acesso_fim'
 ]
 
-SLCT_IDS = [
+CLIENT_GENERAL_INFO_SLCT_IDS = [
     'id_responsavel_tecnico',
     'id_responsavel_administrativo',
     'id_responsavel_seguranca',
@@ -15,9 +16,9 @@ SLCT_IDS = [
     'id_valida_conf'
 ]
 
-PARTIAL_PHONE_ID = 'telefone_set-'
+CLIENT_PARTIAL_PHONE_ID = 'telefone_set-'
 
-TD_CLASSES = [
+CLIENT_PHONES_TD_CLASSES = [
     'field-ddd',
     'field-numero',
     'field-ramal',
@@ -25,7 +26,7 @@ TD_CLASSES = [
     'field-obs'
 ]
 
-ADDR_IDS = [
+CLIENT_ADDR_IDS = [
     'id_endereco-0-logradouro',
     'id_endereco-0-complemento',
     'id_endereco-0-numero',
@@ -36,5 +37,27 @@ ADDR_IDS = [
     'id_endereco-0-cep'
 ]
 
-OPERATOR_ID = 'id_clientexoperadora_set-0-operadora'
+CLIENT_OPERATOR_ID = 'id_clientexoperadora_set-0-operadora'
 
+
+# HTML classes and id's for operator scraping==============
+OPERATOR_GENERAL_INFO_INPT_IDS = [
+    'id_nome',
+    'id_email',
+    'id_cnpj',
+    'id_descricao',
+    'id_horario_acesso',
+    'id_horario_acesso_fim'
+]
+
+OPERATOR_GENERAL_INFO_SLCT_IDS = [
+    'id_atendimento_nivel_1',
+    'id_atendimento_nivel_2',
+    'id_atendimento_nivel_3'
+]
+
+OPERATOR_PARTIAL_PHONE_ID = CLIENT_PARTIAL_PHONE_ID
+OPERATOR_PHONE_TD_CLASSES = CLIENT_PHONES_TD_CLASSES
+OPERATOR_PARTIAL_CLIENT_ID = 'clientexoperadora_set-'
+OPERATOR_CLIENT_TD_CLASS = 'field-cliente'
+OPERATOR_ADDR_IDS = CLIENT_ADDR_IDS
