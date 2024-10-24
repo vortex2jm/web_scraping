@@ -61,3 +61,17 @@ OPERATOR_PHONE_TD_CLASSES = CLIENT_PHONES_TD_CLASSES
 OPERATOR_PARTIAL_CLIENT_ID = 'clientexoperadora_set-'
 OPERATOR_CLIENT_TD_CLASS = 'field-cliente'
 OPERATOR_ADDR_IDS = CLIENT_ADDR_IDS
+
+# HTML classes and id's for circuits scraping==============
+CIRCUIT_TABLE_ID = 'result_list'
+CIRCUIT_DESIGNATION_ID = 'field-designacao'
+CIRCUIT_ROW_IDS = [
+    'field-capacidade',
+    'field-cliente',
+    'field-operadora',
+    'field-tipo_gerencia',
+    'field-data_ativacao',
+    'field-data_desativacao',
+    'field-porta_ativo_rede'
+]
+

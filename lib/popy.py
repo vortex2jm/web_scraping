@@ -18,7 +18,6 @@ class PopyScraping:
 
     #===============
     def login(self):
-        print('Logging in...')
         try:
             session = requests.Session()            # Setting up session
             login_page_res = session.get(self.__login_url)     # Getting login page
@@ -46,7 +45,6 @@ class PopyScraping:
                     raise Exception("Could not login - Incorrect user or password!")
 
                 elif login_res.status_code == 200:  # If it redirect to admin page with accepted status code
-                    print("Login succesfully!")
                     self.__session = session
                 else:   
                     raise Exception(f"Could not login: {login_res.status_code}")
@@ -74,8 +72,6 @@ class PopyScraping:
             phones = self.__get_client_phones(soup)
             address = self.__get_client_address(soup)
             operator = self.__get_client_operator(soup)
-
-            print(f'{general_info["nome"]} extracted!')
 
             return {**general_info, **phones, **address, **operator}        
         except Exception as e:
@@ -167,8 +163,6 @@ class PopyScraping:
             phones = self.__get_operator_phones(soup)
             address = self.__get_operator_address(soup)
             clients = self.__get_operator_clients(soup)
-
-            print(f'{general_info["nome"]} extracted!')
 
             return {**general_info, **phones, **address, **clients}
                 
@@ -265,14 +259,24 @@ class PopyScraping:
 
             soup = BeautifulSoup(res.text, 'html.parser')
             
-            # general_info = self.__get_client_general_info(soup)
-            # phones = self.__get_client_phones(soup)
-            # address = self.__get_client_address(soup)
-            # operator = self.__get_client_operator(soup)
+            circuits = []
+            circuit_table = soup.find('table', id='result_list')
 
-            print(f'{1} extracted!')
+            table_rows = circuit_table.find_all('tr')
 
-            return {}        
+            for row in table_rows:
+                circuit = {}
+                th_element = row.find('th', class_=utils.CIRCUIT_DESIGNATION_ID)
+                if th_element:
+                    circuit[utils.CIRCUIT_DESIGNATION_ID.replace('field-','')] = th_element.get_text()
+                for td_id in utils.CIRCUIT_ROW_IDS:
+                    td_element = row.find('td', class_=td_id)
+                    if td_element:
+                        circuit[td_id.replace('field-','')] = td_element.get_text()
+                circuits.append(circuit)    
+
+            return list(filter(bool, circuits))
+                
         except Exception as e:
             print(f"Could not get circuit data - {e}")
             exit(1)
